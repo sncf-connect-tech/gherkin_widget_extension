@@ -27,7 +27,6 @@ TestConfiguration testWidgetsConfiguration(
   Iterable<StepDefinitionGeneric<World>> steps, {
   String featurePath = '*.feature',
   required String featuresDirectoryPath,
-  required String dirRoot,
   String? featureDefaultLanguage,
   TestConfiguration? testConfiguration,
   Iterable<Reporter>? reporters
@@ -40,25 +39,28 @@ TestConfiguration testWidgetsConfiguration(
     log('Tags : $tags');
   }
 
+  final currentDirectory = Directory.current;
+  final currentParentPath = currentDirectory.parent.path;
+
   return (testConfiguration ?? TestConfiguration())
     ..features = [Glob(featurePath)]
     ..featureFileMatcher = IoFeatureFileAccessor(
-        workingDirectory: Directory('${Directory.current.parent.path}/$featuresDirectoryPath'))
+        workingDirectory: Directory('$currentParentPath/$featuresDirectoryPath'))
     ..featureFileReader = IoFeatureFileAccessor(
-        workingDirectory: Directory('${Directory.current.parent.path}/$featuresDirectoryPath'))
+        workingDirectory: Directory('$currentParentPath/$featuresDirectoryPath'))
     ..featureDefaultLanguage = featureDefaultLanguage ?? "fr"
     ..tagExpression = tags
     ..hooks = [WidgetHooks()]
     ..order = ExecutionOrder.sequential
     ..stopAfterTestFailed = false
-    ..reporters = [...defaultReporters, ...?reporters, XmlReporter(dirRoot: dirRoot)]
+    ..reporters = [...defaultReporters, ...?reporters, XmlReporter(dirRoot: currentDirectory.path)]
     ..stepDefinitions = steps
     ..defaultTimeout = const Duration(milliseconds: defaultConnexionTimeoutInMs * 10);
 }
 
 Future<void> runTest(String testFileGlob,
-    {required CommonFinders finder, required WidgetTester tester, featureDefaultLanguage, required String featuresDirectoryPath, required String dirRoot, TestConfiguration? testConfiguration, required List<StepDefinitionGeneric<World>> steps}) async {
-  final config = testWidgetsConfiguration(steps, featurePath: testFileGlob, featureDefaultLanguage: featureDefaultLanguage, featuresDirectoryPath: featuresDirectoryPath, dirRoot: dirRoot, testConfiguration: testConfiguration)..createWorld =
+    {required CommonFinders finder, required WidgetTester tester, featureDefaultLanguage, required String featuresDirectoryPath, TestConfiguration? testConfiguration, required List<StepDefinitionGeneric<World>> steps}) async {
+  final config = testWidgetsConfiguration(steps, featurePath: testFileGlob, featureDefaultLanguage: featureDefaultLanguage, featuresDirectoryPath: featuresDirectoryPath, testConfiguration: testConfiguration)..createWorld =
       (TestConfiguration config) => Future.value(currentWorld = CucumberWorld(tester, tester.ensureSemantics()));
   return GherkinRunner().execute(config);
 }
