@@ -28,8 +28,14 @@ extension CustomFinder on CommonFinders {
   }
 }
 
-Future<void> pumpWidget(Widget child) async {
+Future<void> pumpWidgetWithMaterial(Widget child,
+    {StatelessWidget? customMaterialApp}) async {
   await currentWorld.tester.pumpWidget(MaterialTestWidget(child: child));
+}
+
+Future<void> pumpWidget(Widget child,
+    {StatelessWidget? customMaterialApp}) async {
+  await currentWorld.tester.pumpWidget(child);
 }
 
 Future<void> disposeWidget() async {
