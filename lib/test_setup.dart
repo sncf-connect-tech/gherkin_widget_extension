@@ -43,9 +43,9 @@ TestConfiguration testWidgetsConfiguration(
   return (testConfiguration ?? TestConfiguration())
     ..features = [Glob(featurePath)]
     ..featureFileMatcher = IoFeatureFileAccessor(
-        workingDirectory: Directory('${Directory.current.parent.path}$featuresDirectoryPath'))
+        workingDirectory: Directory('${Directory.current.parent.path}/$featuresDirectoryPath'))
     ..featureFileReader = IoFeatureFileAccessor(
-        workingDirectory: Directory('${Directory.current.parent.path}$featuresDirectoryPath'))
+        workingDirectory: Directory('${Directory.current.parent.path}/$featuresDirectoryPath'))
     ..featureDefaultLanguage = featureDefaultLanguage ?? "fr"
     ..tagExpression = tags
     ..hooks = [WidgetHooks()]
