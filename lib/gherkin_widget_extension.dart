@@ -10,3 +10,4 @@ export 'package:gherkin_widget_extension/reporters/xml_reporter.dart';
 export 'package:gherkin_widget_extension/widget_test.dart';
 export 'package:gherkin_widget_extension/test_setup.dart';
 export 'package:gherkin_widget_extension/utils/widget_actions.dart';
+export 'package:gherkin_widget_extension/utils/material_widget_app.dart';
