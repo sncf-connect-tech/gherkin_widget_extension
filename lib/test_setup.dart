@@ -58,8 +58,7 @@ TestConfiguration testWidgetsConfiguration(
 
 Future<void> runTest(String testFileGlob,
     {required CommonFinders finder, required WidgetTester tester, featureDefaultLanguage, required String featuresDirectoryPath, required String dirRoot, TestConfiguration? testConfiguration, required List<StepDefinitionGeneric<World>> steps}) async {
-  final config = testWidgetsConfiguration(steps, featurePath: testFileGlob, featureDefaultLanguage: featureDefaultLanguage, featuresDirectoryPath: featuresDirectoryPath, dirRoot: dirRoot, testConfiguration: testConfiguration);
-  config.createWorld =
-        (TestConfiguration config) => Future.value(currentWorld = CucumberWorld(tester, tester.ensureSemantics()));
+  final config = testWidgetsConfiguration(steps, featurePath: testFileGlob, featureDefaultLanguage: featureDefaultLanguage, featuresDirectoryPath: featuresDirectoryPath, dirRoot: dirRoot, testConfiguration: testConfiguration)..createWorld =
+      (TestConfiguration config) => Future.value(currentWorld = CucumberWorld(tester, tester.ensureSemantics()));
   return GherkinRunner().execute(config);
 }
