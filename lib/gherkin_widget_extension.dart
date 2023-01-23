@@ -8,3 +8,4 @@ export 'package:gherkin_widget_extension/reporters/custom_stdout_reporter.dart';
 export 'package:gherkin_widget_extension/reporters/monochrome_printer.dart';
 export 'package:gherkin_widget_extension/reporters/xml_reporter.dart';
 export 'package:gherkin_widget_extension/widget_test.dart';
+export 'package:gherkin_widget_extension/test_setup.dart';
