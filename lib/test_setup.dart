@@ -1,66 +1,15 @@
-import 'dart:developer';
 import 'dart:io';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gherkin/gherkin.dart';
-import 'package:glob/glob.dart';
-
-import 'reporters/custom_stdout_reporter.dart';
-import 'reporters/custom_test_run_summary_reporter.dart';
-import 'reporters/xml_reporter.dart';
-import 'world/cucumber_world.dart';
+import 'package:gherkin_widget_extension/world/widget_cucumber_world.dart';
 import 'package:logger/logger.dart';
 
-import 'world/widget_hooks.dart';
-
-late CucumberWorld currentWorld;
-
-const defaultConnexionTimeoutInMs = 60000;
-
-final testId = Platform.environment['TEST_ID'];
-final dumpFolderPath = Platform.environment['DUMP_FOLDER'] ?? 'widget_tests_dumps';
+late WidgetCucumberWorld currentWorld;
 final Logger logger = Logger(printer: PrettyPrinter(methodCount: 0, printEmojis: false));
 
-var defaultReporters = [CustomStdoutReporter(), CustomTestRunSummaryReporter()];
-
-TestConfiguration testWidgetsConfiguration(
-  Iterable<StepDefinitionGeneric<World>> steps, {
-  String featurePath = '*.feature',
-  required String featuresDirectoryPath,
-  String? featureDefaultLanguage,
-  TestConfiguration? testConfiguration,
-  Iterable<Reporter>? reporters
-}) {
-  var tags = "@widget";
-  if (testId != null) {
-    tags += " and ($testId)";
-  }
-  if (kDebugMode) {
-    log('Tags : $tags');
-  }
-
-  final currentDirectory = Directory.current;
-  final currentParentPath = currentDirectory.parent.path;
-
-  return (testConfiguration ?? TestConfiguration())
-    ..features = [Glob(featurePath)]
-    ..featureFileMatcher = IoFeatureFileAccessor(
-        workingDirectory: Directory('$currentParentPath/$featuresDirectoryPath'))
-    ..featureFileReader = IoFeatureFileAccessor(
-        workingDirectory: Directory('$currentParentPath/$featuresDirectoryPath'))
-    ..featureDefaultLanguage = featureDefaultLanguage ?? "fr"
-    ..tagExpression = tags
-    ..hooks = [WidgetHooks()]
-    ..order = ExecutionOrder.sequential
-    ..stopAfterTestFailed = false
-    ..reporters = [...defaultReporters, ...?reporters, XmlReporter(dirRoot: currentDirectory.path)]
-    ..stepDefinitions = steps
-    ..defaultTimeout = const Duration(milliseconds: defaultConnexionTimeoutInMs * 10);
-}
-
-Future<void> runTest(String testFileGlob,
-    {required CommonFinders finder, required WidgetTester tester, featureDefaultLanguage, required String featuresDirectoryPath, TestConfiguration? testConfiguration, required List<StepDefinitionGeneric<World>> steps}) async {
-  final config = testWidgetsConfiguration(steps, featurePath: testFileGlob, featureDefaultLanguage: featureDefaultLanguage, featuresDirectoryPath: featuresDirectoryPath, testConfiguration: testConfiguration)..createWorld =
-      (TestConfiguration config) => Future.value(currentWorld = CucumberWorld(tester, tester.ensureSemantics()));
+Future<void> runTest({required WidgetTester tester, required TestConfiguration testConfiguration, WidgetCucumberWorld? customWord}) async {
+  final config = testConfiguration..createWorld =
+      (TestConfiguration config) => Future.value(currentWorld = customWord ?? WidgetCucumberWorld(tester, tester.ensureSemantics()));
   return GherkinRunner().execute(config);
 }

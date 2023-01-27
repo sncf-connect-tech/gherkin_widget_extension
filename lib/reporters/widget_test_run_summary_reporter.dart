@@ -1,8 +1,7 @@
 import 'package:gherkin/gherkin.dart';
+import 'package:gherkin_widget_extension/reporters/widget_stdout_reporter.dart';
 
-import 'custom_stdout_reporter.dart';
-
-class CustomTestRunSummaryReporter extends CustomStdoutReporter {
+class WidgetTestRunSummaryReporter extends WidgetStdoutReporter {
   final _timer = Stopwatch();
   final List<StepFinishedMessage> _ranSteps = <StepFinishedMessage>[];
   final List<ScenarioFinishedMessage> _ranScenarios = <ScenarioFinishedMessage>[];

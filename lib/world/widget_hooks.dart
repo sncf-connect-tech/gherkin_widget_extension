@@ -9,6 +9,11 @@ import 'package:gherkin_widget_extension/utils/widget_actions.dart';
 import 'package:gherkin_widget_extension/utils/widget_renderer.dart';
 
 class WidgetHooks implements Hook {
+
+  final String dumpFolderPath;
+
+  WidgetHooks(this.dumpFolderPath);
+
   @override
   int get priority => 1;
 

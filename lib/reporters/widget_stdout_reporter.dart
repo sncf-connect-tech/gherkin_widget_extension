@@ -3,7 +3,7 @@ import 'package:logger/logger.dart';
 
 import 'monochrome_printer.dart';
 
-class CustomStdoutReporter extends Reporter {
+class WidgetStdoutReporter extends Reporter {
   /// https://talyian.github.io/ansicolors/
   final AnsiColor NEUTRAL_COLOR = AnsiColor.none();
   final AnsiColor DEBUG_COLOR = AnsiColor.fg(7); // gray

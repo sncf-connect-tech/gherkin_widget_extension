@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gherkin/gherkin.dart';
 
-class CucumberWorld extends World {
+class WidgetCucumberWorld extends World {
   final WidgetTester tester;
   final SemanticsHandle semantics;
   late String scenarioName;
@@ -20,7 +20,7 @@ class CucumberWorld extends World {
     return scenarioName.replaceAll(" ", "_").replaceAll(":_", "").toLowerCase();
   }
 
-  CucumberWorld(this.tester, this.semantics);
+  WidgetCucumberWorld(this.tester, this.semantics);
 }
 
 abstract class Bucket {}
