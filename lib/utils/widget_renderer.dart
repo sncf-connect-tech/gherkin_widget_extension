@@ -6,23 +6,43 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/rendering.dart';
 
-Future<void> takeScreenshot() async {
+Future<void> takeScreenshot({withWidgetTreeRender = false}) async {
   await currentWorld.tester.pumpAndSettle();
-  RenderRepaintBoundary boundary = _getMainWidget().renderObject! as RenderRepaintBoundary;
-  ui.Image image = await boundary.toImage();
-  ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-  Uint8List pngBytes = byteData!.buffer.asUint8List();
-  await currentWorld.screenshot?.writeAsBytes(pngBytes);
+  RenderObject? renderObject = _getMainWidget()?.renderObject;
+  if (renderObject != null) {
+    RenderRepaintBoundary boundary = renderObject as RenderRepaintBoundary;
+    ui.Image image = await boundary.toImage();
+    ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    Uint8List pngBytes = byteData!.buffer.asUint8List();
+    await currentWorld.screenshot?.writeAsBytes(pngBytes);
+
+    if (withWidgetTreeRender) {
+      await dumpWidgetRender();
+    }
+  } else {
+    logger.e('Screenshot failed.');
+  }
 }
 
 Future<void> dumpWidgetRender() async {
-  final widgetRendering = _printWidgetTree(_getMainWidget(), 0);
-  logger.i("Impression widget :\n $widgetRendering");
-  await currentWorld.dumpFile?.writeAsString(widgetRendering.toString());
+  Element? widget = _getMainWidget();
+  if (widget != null) {
+    final widgetRendering = _printWidgetTree(_getMainWidget(), 0);
+    logger.i("Impression widget :\n $widgetRendering");
+    await currentWorld.dumpFile?.writeAsString(widgetRendering.toString());
+  } else {
+    logger.e('Widget render dump failed.');
+  }
 }
 
-Element _getMainWidget() {
-  return currentWorld.tester.allElements.firstWhere((element) => element.widget.runtimeType == RepaintBoundary);
+Element? _getMainWidget() {
+  try {
+    return currentWorld.tester.allElements
+        .firstWhere((element) => element.widget.runtimeType == RepaintBoundary);
+  } catch (e) {
+    logger.e('Cannot get a RepaintBoundary widget.');
+    return null;
+  }
 }
 
 int? firstLevel;
