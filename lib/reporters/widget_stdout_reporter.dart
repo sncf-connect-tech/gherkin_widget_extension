@@ -17,7 +17,8 @@ class WidgetStdoutReporter extends Reporter {
   @override
   Future<void> onScenarioStarted(StartedMessage message) async {
     logger.i(COOL_COLOR("\n${"-" * 100}\n"));
-    logger.i(COOL_COLOR('${DateTime.now()} - Running scenario: ${message.name + _getContext(message.context)}'));
+    logger.i(COOL_COLOR(
+        '${DateTime.now()} - Running scenario: ${message.name + _getContext(message.context)}'));
   }
 
   @override
@@ -29,15 +30,24 @@ class WidgetStdoutReporter extends Reporter {
 
   @override
   Future<void> onStepFinished(StepFinishedMessage message) async {
-    var stepColor = message.result.result == StepExecutionResult.pass ? PASS_COLOR : FAIL_COLOR;
-    var printMessage = [
-      stepColor('  '),
-      stepColor(_getStatePrefixIcon(message.result.result)),
-      stepColor(message.name),
-      NEUTRAL_COLOR(_getExecutionDuration(message.result)),
-      stepColor(_getReasonMessage(message.result)),
-      stepColor(_getErrorMessage(message.result))
-    ].join((' ')).trimRight();
+    var stepColor = message.result.result == StepExecutionResult.pass
+        ? PASS_COLOR
+        : FAIL_COLOR;
+    String printMessage;
+    if (message.result is ErroredStepResult) {
+      var errorMessage = (message.result as ErroredStepResult);
+      printMessage =
+          FAIL_COLOR('${errorMessage.exception}\n${errorMessage.stackTrace}');
+    } else {
+      printMessage = [
+        stepColor('  '),
+        stepColor(_getStatePrefixIcon(message.result.result)),
+        stepColor(message.name),
+        NEUTRAL_COLOR(_getExecutionDuration(message.result)),
+        stepColor(_getReasonMessage(message.result)),
+        stepColor(_getErrorMessage(message.result))
+      ].join((' ')).trimRight();
+    }
     logger.i(printMessage);
 
     // TODO adapter à cette classe
@@ -59,7 +69,8 @@ class WidgetStdoutReporter extends Reporter {
   }
 
   String _getReasonMessage(StepResult stepResult) {
-    if (stepResult.resultReason != null && stepResult.resultReason!.isNotEmpty) {
+    if (stepResult.resultReason != null &&
+        stepResult.resultReason!.isNotEmpty) {
       return '\n      ${stepResult.resultReason}';
     } else {
       return '';
@@ -75,7 +86,8 @@ class WidgetStdoutReporter extends Reporter {
   }
 
   String _getContext(RunnableDebugInformation context) {
-    return NEUTRAL_COLOR("\t# ${_getFeatureFilePath(context)}:${context.lineNumber}");
+    return NEUTRAL_COLOR(
+        "\t# ${_getFeatureFilePath(context)}:${context.lineNumber}");
   }
 
   String _getFeatureFilePath(RunnableDebugInformation context) {

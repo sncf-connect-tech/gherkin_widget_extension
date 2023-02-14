@@ -41,8 +41,7 @@ class WidgetHooks implements Hook {
       var dumpFileName = _getDumpFilePath();
       currentWorld.dumpFile = File("$dumpFileName.txt");
       currentWorld.screenshot = File("$dumpFileName.png");
-      await takeScreenshot();
-      await dumpWidgetRender();
+      await takeScreenshot(withWidgetTreeRender: true);
     }
   }
 
