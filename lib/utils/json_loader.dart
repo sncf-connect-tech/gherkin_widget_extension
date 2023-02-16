@@ -10,7 +10,7 @@ class JsonLoader {
   ) async {
     final cache = <String, String>{};
     for (final pattern in globs) {
-      final jsonPath = "${Directory.current.path}/test/widget/json/$pattern";
+      final jsonPath = "${Directory.current.path}/$pattern";
       await for (final path in Glob(jsonPath).list()) {
         if (path is File) {
           final file = await (path as File).readAsString();
