@@ -120,8 +120,7 @@ flutter test test/widget_test_runner.dart
 
 ## -- Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
+🚧 _More details soon..._
 
 ### 🪣 `WidgetCucumberWorld` and buckets
 🚧 _More details soon..._
