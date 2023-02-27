@@ -10,14 +10,15 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_test:
+    sdk: flutter
   glob: ^2.1.1
   gherkin: ^2.0.8
   logger: ^1.1.0
   xml: ^6.0.1
+  path: ^1.8.1
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
   flutter_lints: ^2.0.0
 
 # For information on the generic Dart part of this file, see the
