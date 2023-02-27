@@ -1,7 +1,7 @@
 name: gherkin_widget_extension
 description: An extension of gherkin package for widgets
 version: 0.0.1
-homepage:
+homepage: https://github.com/sncf-connect-tech/gherkin_widget_extension
 
 environment:
   sdk: ">=2.17.5 <3.0.0"
