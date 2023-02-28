@@ -12,7 +12,7 @@ class WidgetHooks implements Hook {
 
   final String dumpFolderPath;
 
-  WidgetHooks(this.dumpFolderPath);
+  WidgetHooks({required this.dumpFolderPath});
 
   @override
   int get priority => 1;
