@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><testsuites><testsuite name="Counter" filename="/Users/katia_chiron/dev/gherkin_widget_extension/example/test/features/counter.feature" tests="2" failures="1" errors="0" time="1615" suite="Counter"><testcase name="Counter increases when the button is pressed" time="1173"><system-out>Given I launch the counter application................................................................................pass
+When I tap the "Increment" button 10 times................................................................................pass
+Then I expect the "counter" to be "10"................................................................................pass</system-out></testcase><testcase name="Counter increases when the button is pressed" time="374"><system-out>Given I launch the counter application................................................................................pass
+When I tap the "Increment" button 8 times................................................................................pass
+Then I expect the "counter" to be "10"................................................................................error
+[[ATTACHMENT|/Users/katia_chiron/dev/gherkin_widget_extension/example/widget_tests_report_folder/counter_increases_when_the_button_is_pressed.png]]</system-out><failure message="Expected: exactly one matching node in the widget tree&#xA;  Actual: _AncestorFinder:&lt;zero widgets with type &quot;Text&quot; which is an ancestor of element matching predicate (Closure: (Element) => bool)>&#xA;   Which: means none were found but one was expected&#xA;Aucun élément 10 de type Text n'a été trouvé.&#xA;">
+Given I launch the counter application................................................................................pass
+When I tap the "Increment" button 8 times................................................................................pass
+Then I expect the "counter" to be "10"................................................................................error
+
+Expected: exactly one matching node in the widget tree
+  Actual: _AncestorFinder:&lt;zero widgets with type "Text" which is an ancestor of element matching predicate (Closure: (Element) => bool)>
+   Which: means none were found but one was expected
+Aucun élément 10 de type Text n'a été trouvé.
+
+
+#0      fail (package:test_api/src/expect/expect.dart:137:31)
+#1      _expect (package:test_api/src/expect/expect.dart:132:3)
+#2      expect (package:test_api/src/expect/expect.dart:46:3)
+#3      expect (package:flutter_test/src/widget_tester.dart:455:16)
+#4      CustomFinder.widgetWithSemanticLabel (package:gherkin_widget_extension/utils/widget_actions.dart:19:5)
+#5      thenCounterIsUpdated.&lt;anonymous closure> (file:///Users/katia_chiron/dev/gherkin_widget_extension/example/test/step_definitions/steps.dart:36:23)
+#6      thenCounterIsUpdated.&lt;anonymous closure> (file:///Users/katia_chiron/dev/gherkin_widget_extension/example/test/step_definitions/steps.dart:35:47)
+#7      Function._apply (dart:core-patch/function_patch.dart:11:73)
+#8      Function.apply (dart:core-patch/function_patch.dart:34:12)
+#9      GenericFunctionStepDefinition.onRun (package:gherkin/src/gherkin/steps/step_definition_implementations.dart:236:21)
+#10     StepDefinitionGeneric.run.&lt;anonymous closure> (package:gherkin/src/gherkin/steps/step_definition.dart:42:32)
+#11     StepDefinitionGeneric.run.&lt;anonymous closure> (package:gherkin/src/gherkin/steps/step_definition.dart:38:9)
+#12     Perf.measure (package:gherkin/src/utils/perf.dart:11:26)
+#13     StepDefinitionGeneric.run (package:gherkin/src/gherkin/steps/step_definition.dart:37:18)
+#14     FeatureFileRunner._runStep.&lt;anonymous closure> (package:gherkin/src/feature_file_runner.dart:336:31)
+#15     FeatureFileRunner._runStep.&lt;anonymous closure> (package:gherkin/src/feature_file_runner.dart:336:9)
+#16     FeatureFileRunner._runWithinTest (package:gherkin/src/feature_file_runner.dart:365:30)
+#17     FeatureFileRunner._runStep (package:gherkin/src/feature_file_runner.dart:334:22)
+&lt;asynchronous suspension>
+#18     StackZoneSpecification._registerUnaryCallback.&lt;anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:125:47)
+&lt;asynchronous suspension>
+
+
+--------------------------------------------------
+Impression widget :
+--------------------------------------------------
+ Text : You have pushed the button this many times:
+ Text : 8
+-------------------------- Text : Flutter Demo Home Page
+---------------- Semantics : Increment
+</failure></testcase></testsuite></testsuites>

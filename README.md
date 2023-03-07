@@ -24,31 +24,31 @@ set up the configuration and you are ready to describe actions and assertions of
 ## Table of Contents
 
 <!-- TOC -->
-  * [Table of Contents](#table-of-contents)
-  * [-- Features](#---features)
-  * [-- Getting started](#---getting-started)
+* [Table of Contents](#table-of-contents)
+* [-- Features](#---features)
+* [-- Getting started](#---getting-started)
     * [🥒 Add `gherkin_widget_extension` dependency](#-add-gherkin_widget_extension-dependency)
     * [✏️ Write a scenario](#%EF%B8%8F-write-a-scenario)
     * [🔗 Declare step definitions](#-declare-step-definitions)
     * [⚙️ Add some configuration](#%EF%B8%8F-add-some-configuration)
-      * [Package distinctive features](#package-distinctive-features)
-        * [`..hooks`](#hooks)
-        * [`..reporters`](#reporters)
+        * [Package distinctive features](#package-distinctive-features)
+            * [`..hooks`](#hooks)
+            * [`..reporters`](#reporters)
     * [🧪 Set up the test runner](#-set-up-the-test-runner)
     * [🪄 Run your tests](#-run-your-tests)
     * [🎬️ Let's go!](#%EF%B8%8F-lets-go)
-  * [-- Usage](#---usage)
+* [-- Usage](#---usage)
     * [🌎 `WidgetCucumberWorld` advantages](#-widgetcucumberworld-advantages)
     * [🪣 Buckets for data](#-buckets-for-data)
     * [👁️ Don't forget the accessibility](#%EF%B8%8F-dont-forget-the-accessibility)
     * [🔄 Loading data for widgets with `JsonLoader`](#-loading-data-for-widgets-with-jsonloader)
     * [📸 A Hook for screenshot and widget tree rendering](#-a-hook-for-screenshot-and-widget-tree-rendering)
     * [📋 Widget test reporters](#-widget-test-reporters)
-      * [`MonochromePrinter`](#monochromeprinter)
-      * [`WidgetStdoutReporter`](#widgetstdoutreporter)
-      * [`WidgetTestRunSummaryReporter`](#widgettestrunsummaryreporter)
-      * [`XmlReporter`](#xmlreporter)
-      * [Add reporters in test configuration](#add-reporters-in-test-configuration)
+        * [`MonochromePrinter`](#monochromeprinter)
+        * [`WidgetStdoutReporter`](#widgetstdoutreporter)
+        * [`WidgetTestRunSummaryReporter`](#widgettestrunsummaryreporter)
+        * [`XmlReporter`](#xmlreporter)
+        * [Add reporters in test configuration](#add-reporters-in-test-configuration)
 <!-- TOC -->
 
 ***
@@ -102,8 +102,10 @@ Next step: implementation of step definitions.
 
 ### 🔗 Declare step definitions
 
-Step definitions are like links between the gherkin sentence and the code that interacts with the widget. Usually `given`
-steps are used to set up the test context, `when` step(s) represents the main action of the test (When the user validates
+Step definitions are like links between the gherkin sentence and the code that interacts with the widget.
+Usually `given`
+steps are used to set up the test context, `when` step(s) represents the main action of the test (When the user
+validates
 the form, When the user applies his choice, ...) and the `then` steps assert everything assertable on the screen
 (text, state, semantics, ...).
 
@@ -184,12 +186,22 @@ More information [here](#-widget-test-reporters).
 
 ### 🧪 Set up the test runner
 
-Create a new file `widget_test_runner.dart` in `test` folder and call the test runner method:
+Create a new file `widget_test_runner.dart` in the `test` folder and call the test runner method:
 
 ```dart
 void main() {
   testWidgetsGherkin('widget tests',
       testConfiguration: TestWidgetsConfiguration(featurePath: "test/features/*.feature"));
+}
+```
+
+Create another file named `flutter_test_config.dart` in the `test` folder and declare the test executing configuration
+to enable font loading _(required for screenshots)_:
+
+```dart
+Future<void> testExecutable(FutureOr<void> Function() testMain) async {
+  await loadAppFonts();
+  await testMain();
 }
 ```
 
@@ -274,32 +286,35 @@ Keep in mind that bucket type is required to use it and access to its data (here
 ### 👁️ Don't forget the accessibility
 
 Accessibility is essential in mobile application and must be tested as well. This package provides a method to test
-widget semantics: 
+widget semantics:
 
 ```dart
 Finder widgetWithSemanticLabel(
-  Type widgetType, 
-  String semanticLabel, 
-  {bool skipOffstage = true, 
-  Matcher? semanticMatcher}
+Type widgetType,
+    String semanticLabel,
+{bool skipOffstage = true,
+Matcher? semanticMatcher}
 )
 ```
 
 This method allows you to find a widget by its type, its semantic label and its full semantics:
-```dart
-final widgetToFind = find.widgetWithSemanticLabel(Checkbox, "Checkbox label",
-          semanticMatcher: matchesSemantics(
-              hasEnabledState: true,
-              label: "Checkbox label",
-              hasTapAction: true,
-              isEnabled: true,
-              isFocusable: true,
-              textDirection: TextDirection.ltr,
-              hasCheckedState: true,
-              isChecked: true));
 
-      expect(widgetToFind, findsOneWidget);
+```dart
+
+final widgetToFind = find.widgetWithSemanticLabel(Checkbox, "Checkbox label",
+    semanticMatcher: matchesSemantics(
+        hasEnabledState: true,
+        label: "Checkbox label",
+        hasTapAction: true,
+        isEnabled: true,
+        isFocusable: true,
+        textDirection: TextDirection.ltr,
+        hasCheckedState: true,
+        isChecked: true));
+
+expect(widgetToFind, findsOneWidget);
 ```
+
 The `expect` raises an `AssertionError` if no corresponding widget exists.
 
 ### 🔄 Loading data for widgets with `JsonLoader`
@@ -314,8 +329,13 @@ var jsonMap = await JsonLoader.loadJson("path/to/json/folder");
 ```
 `jsonMap` contains a map where keys are json filenames and values the json files content.
 
-
 ### 📸 A Hook for screenshot and widget tree rendering
+
+> 📣 At least one font must be declared in the `pubspec.yml` to have nice and understandable screenshots (Squares will
+> replace fonts otherwise).
+>
+> 📣 The `flutter_test_config.dart` must exist at the root of `test` directory (
+> See [🧪 Set up the test runner](#-set-up-the-test-runner) paragraph).
 
 Hooks contain methods executed before or after specific milestones during a test driven by Cucumber (before/after scenario, 
 before/after steps, ...). More information about Hooks [here](https://pub.dev/packages/gherkin#hooks).
@@ -328,7 +348,8 @@ TestConfiguration()
 ..hooks = [WidgetHooks(dumpFolderPath: 'widget_tests_report_folder')]
 ```
 
-**Parameter `dumpFolderPath` is mandatory**: it represents the report folder where screenshots and widget rendering will be
+**Parameter `dumpFolderPath` is mandatory**: it represents the report folder where screenshots and widget rendering will
+be
 stored on test failure.
 
 > 📣 This package provides a custom Widget called `MaterialTestWidget`. This widget must encapsulate the widget to pump
@@ -347,6 +368,7 @@ to print your message in the log console without any decorations/emojis/whatever
 #### `WidgetStdoutReporter`
 
 This reporter is in charge of:
+
 * printing the name of the running scenario with its file location,
 * printing each step with its status and time duration
     * `√` if step succeeded
@@ -396,14 +418,15 @@ On failure, a link to the screenshot is also provided.
 > Report [here](https://docs.gitlab.com/ee/ci/testing/unit_test_reports.html).
 
 #### Add reporters in test configuration
+
 To benefit from supplied reporters, they need to be added on the `TestConfiguration`:
 ```dart
 TestConfiguration()
-    ..reporters = [
-      WidgetStdoutReporter(),
-      WidgetTestRunSummaryReporter(),
-      XmlReporter(dirRoot: Directory.current.path)
-    ]
+..reporters = [
+WidgetStdoutReporter(),
+WidgetTestRunSummaryReporter(),
+XmlReporter(dirRoot: Directory.current.path)
+]
 ```
 
 <!--
