@@ -19,39 +19,42 @@ Write your own steps using [gherkin syntax](https://cucumber.io/docs/gherkin/ref
 then create associated [step definitions](https://cucumber.io/docs/guides/overview/#what-is-gherkin),
 set up the configuration and you are ready to describe actions and assertions of your application's widgets.
 
-***
+---
 
 ## Table of Contents
 
 <!-- TOC -->
+
 * [Table of Contents](#table-of-contents)
 * [-- Features](#---features)
 * [-- Getting started](#---getting-started)
-    * [🥒 Add `gherkin_widget_extension` dependency](#-add-gherkin_widget_extension-dependency)
-    * [✏️ Write a scenario](#%EF%B8%8F-write-a-scenario)
-    * [🔗 Declare step definitions](#-declare-step-definitions)
-    * [⚙️ Add some configuration](#%EF%B8%8F-add-some-configuration)
-        * [Package distinctive features](#package-distinctive-features)
-            * [`..hooks`](#hooks)
-            * [`..reporters`](#reporters)
-    * [🧪 Set up the test runner](#-set-up-the-test-runner)
-    * [🪄 Run your tests](#-run-your-tests)
-    * [🎬️ Let's go!](#%EF%B8%8F-lets-go)
+  * [🥒 Add `gherkin_widget_extension` dependency](#-add-gherkin_widget_extension-dependency)
+  * [✏️ Write a scenario](#%EF%B8%8F-write-a-scenario)
+  * [🔗 Declare step definitions](#-declare-step-definitions)
+  * [⚙️ Add some configuration](#%EF%B8%8F-add-some-configuration)
+    * [Package distinctive features](#package-distinctive-features)
+      * [`..hooks`](#hooks)
+      * [`..reporters`](#reporters)
+  * [🧪 Set up the test runner](#-set-up-the-test-runner)
+  * [🪄 Run your tests](#-run-your-tests)
+  * [🎬️ Let's go!](#%EF%B8%8F-lets-go)
 * [-- Usage](#---usage)
-    * [🌎 `WidgetCucumberWorld` advantages](#-widgetcucumberworld-advantages)
-    * [🪣 Buckets for data](#-buckets-for-data)
-    * [👁️ Don't forget the accessibility](#%EF%B8%8F-dont-forget-the-accessibility)
-    * [🔄 Loading data for widgets with `JsonLoader`](#-loading-data-for-widgets-with-jsonloader)
-    * [📸 A Hook for screenshot and widget tree rendering](#-a-hook-for-screenshot-and-widget-tree-rendering)
-    * [📋 Widget test reporters](#-widget-test-reporters)
-        * [`MonochromePrinter`](#monochromeprinter)
-        * [`WidgetStdoutReporter`](#widgetstdoutreporter)
-        * [`WidgetTestRunSummaryReporter`](#widgettestrunsummaryreporter)
-        * [`XmlReporter`](#xmlreporter)
-        * [Add reporters in test configuration](#add-reporters-in-test-configuration)
+  * [🌎 `WidgetCucumberWorld` advantages](#-widgetcucumberworld-advantages)
+  * [🪣 Buckets for data](#-buckets-for-data)
+  * [👁️ Don't forget the accessibility](#%EF%B8%8F-dont-forget-the-accessibility)
+  * [🧩 `WidgetObject` pattern and usage of `TestWidgets` class](#-widgetobject-pattern-and-usage-of-testwidgets-class)
+  * [🔄 Loading data for widgets with `JsonLoader`](#-loading-data-for-widgets-with-jsonloader)
+  * [📸 A Hook for screenshot and widget tree rendering](#-a-hook-for-screenshot-and-widget-tree-rendering)
+  * [📋 Widget test reporters](#-widget-test-reporters)
+    * [`MonochromePrinter`](#monochromeprinter)
+    * [`WidgetStdoutReporter`](#widgetstdoutreporter)
+    * [`WidgetTestRunSummaryReporter`](#widgettestrunsummaryreporter)
+    * [`XmlReporter`](#xmlreporter)
+    * [Add reporters in test configuration](#add-reporters-in-test-configuration)
+
 <!-- TOC -->
 
-***
+---
 
 ## -- Features
 
@@ -63,7 +66,7 @@ set up the configuration and you are ready to describe actions and assertions of
 * Screenshot and widget tree dumped in a file on test failure,
 * [Gherkin reporters](https://pub.dev/packages/gherkin#reporters) adapted for widget tests,
 
-***
+---
 
 ## -- Getting started
 
@@ -109,7 +112,7 @@ validates
 the form, When the user applies his choice, ...) and the `then` steps assert everything assertable on the screen
 (text, state, semantics, ...).
 
-In the `test` folder, create a `step_definitions` folder and within this folder, create a `steps.dart` file and start 
+In the `test` folder, create a `step_definitions` folder and within this folder, create a `steps.dart` file and start
 implementing step definitions:
 
 ```dart
@@ -125,6 +128,7 @@ StepDefinitionGeneric<WidgetCucumberWorld> givenAFreshApp() {
 ```
 
 > #### 💡 _Advice_
+>
 > For better understanding, one of good practices advises to split step definitions files according to gherkin keywords
 > (all Given step definitions within the same file `given_steps.dart`, all When step definitions within the same file
 > `when_steps.dart`, etc...). Organizing those files into folders representing the feature is a plus.
@@ -221,7 +225,7 @@ You should see these kind of logs:
 Write as many gherkin scenarii as you need, play with cucumber tags to run some of your scenarii, and explore all
 options the [gherkin](https://pub.dev/packages/gherkin) package supply.
 
-***
+---
 
 ## -- Usage
 
@@ -236,7 +240,8 @@ scenario is done, no matter its status.
 You will find more information about the goal of
 the `CucumberWorld` [here](https://pub.dev/packages/gherkin#createworld).
 
-The class `WidgetCucumberWorld` inherits from the `CucumberWorld` class of the gherkin package and exposes the following items:
+The class `WidgetCucumberWorld` inherits from the `CucumberWorld` class of the gherkin package and exposes the following
+items:
 
 * `WidgetTester tester`: allows to interact with the widget (tap, pump, get elements, ...),
 * `SemanticsHandle semantics`: created at the beginning of the test, enables interactions with the `Semantic` widget,
@@ -246,6 +251,7 @@ The class `WidgetCucumberWorld` inherits from the `CucumberWorld` class of the g
 
 No need to create a `WidgetCucumberWorld` object, the package provides one named `currentWorld`, accessible from the
 `context` object:
+
 ```dart
 context.world.tester;
 ```
@@ -256,32 +262,40 @@ context.world.tester;
 
 `Buckets` allows you to organize your data in the `CucumberWorld`. Indeed, if your application has divergent use cases,
 such as tickets sells, customer account or traffic information, etc., you might not want to store all test data together
-within the `CucumberWorld`: you may use `Buckets` to store data according to their business domain (ex: TicketSellBucket,
+within the `CucumberWorld`: you may use `Buckets` to store data according to their business domain (ex:
+TicketSellBucket,
 AccountBucket, ...).
 
 `Buckets` are abstract and generic, so to use them, you need to create a class which implements the `Bucket`
 class:
+
 ```dart
 class ExampleBucket implements Bucket {
   String? buttonAction;
   int nbActions = 0;
 }
 ```
-In this example, the bucket name is `ExampleBucket` and stores two values: the name of the button to interact with, 
+
+In this example, the bucket name is `ExampleBucket` and stores two values: the name of the button to interact with,
 and the number of times it was tapped.
 
-Before storing data into a `Bucket`, it requires to be initialized through the `WidgetCucumberWorld` object named 
+Before storing data into a `Bucket`, it requires to be initialized through the `WidgetCucumberWorld` object named
 `currentWorld`:
+
 ```dart
-currentWorld.bucket = ExampleBucket();
+currentWorld.bucket =
+
+ExampleBucket();
 ```
 
 Then use `currentWorld` for setting and accessing to the `Bucket`'s data:
-```dart
-currentWorld.readBucket<ExampleBucket>().nbActions = count;
-```
-Keep in mind that bucket type is required to use it and access to its data (here `<ExampleBucket>`).
 
+```dart
+currentWorld.readBucket<ExampleBucket>
+().nbActions = count;
+```
+
+Keep in mind that bucket type is required to use it and access to its data (here `<ExampleBucket>`).
 
 ### 👁️ Don't forget the accessibility
 
@@ -290,10 +304,10 @@ widget semantics:
 
 ```dart
 Finder widgetWithSemanticLabel(
-Type widgetType,
-    String semanticLabel,
-{bool skipOffstage = true,
-Matcher? semanticMatcher}
+  Type widgetType,
+  String semanticLabel,
+  {bool skipOffstage = true,
+  Matcher? semanticMatcher}
 )
 ```
 
@@ -317,6 +331,39 @@ expect(widgetToFind, findsOneWidget);
 
 The `expect` raises an `AssertionError` if no corresponding widget exists.
 
+### 🧩 `WidgetObject` pattern and usage of `TestWidgets` class
+
+Organizing the test code according the "Widget Object" pattern can be helpful for maintenance and code clarity.
+The Widget Object pattern (invented for this package) is strongly inspired by the PageObject pattern and applied to
+Flutter widget tests.
+
+In test automation, the Page Object pattern requires to create one class per page (or screen) which gathers not only all
+methods interacting with this page (click, check, ...) but also selectors to this page (how to target a given element on
+this page). This way, understanding and maintenance are eased.
+
+In the widget test context, pieces of screen are tested (or portion of a widget tree), not pages. But, keeping the page
+object logic is still helpful.
+
+The abstract class `TestWidget` can be used as an interface to "widget object" classes to force the implementation of the
+most important method:
+
+* `pumpItPump()` - indicates how pump the widget to test
+
+Example:
+
+```dart
+class MyWidgetObject implements TestWidgets {
+  @override
+  Future<void> pumpItUp() async {
+    var widgetToPump = const MaterialTestWidget(
+      child: MyApp(),
+    );
+    pumpWidget(widgetToPump);
+  }
+}
+```
+
+
 ### 🔄 Loading data for widgets with `JsonLoader`
 
 Applications often use data coming from an API to build components in its screens and widget test cannot depend on
@@ -325,8 +372,9 @@ This way, API Json responses can be stored into files and loaded through the pro
 widget to test.
 
 ```dart
-var jsonMap = await JsonLoader.loadJson("path/to/json/folder");
+var jsonMap = awaitJsonLoader.loadJson("path/to/json/folder");
 ```
+
 `jsonMap` contains a map where keys are json filenames and values the json files content.
 
 ### 📸 A Hook for screenshot and widget tree rendering
@@ -337,7 +385,8 @@ var jsonMap = await JsonLoader.loadJson("path/to/json/folder");
 > 📣 The `flutter_test_config.dart` must exist at the root of `test` directory (
 > See [🧪 Set up the test runner](#-set-up-the-test-runner) paragraph).
 
-Hooks contain methods executed before or after specific milestones during a test driven by Cucumber (before/after scenario, 
+Hooks contain methods executed before or after specific milestones during a test driven by Cucumber (before/after
+scenario,
 before/after steps, ...). More information about Hooks [here](https://pub.dev/packages/gherkin#hooks).
 
 This package supplies a Hook named `WidgetHooks` to improve reporting and provide more information on test failure such
@@ -345,12 +394,13 @@ as screenshots and widget tree rendering. Add this Hook in your `TestConfigurati
 
 ```dart
 TestConfiguration()
-..hooks = [WidgetHooks(dumpFolderPath: 'widget_tests_report_folder')]
+  ..hooks = [
+    WidgetHooks(dumpFolderPath:'widget_tests_report_folder')
+  ]
 ```
 
 **Parameter `dumpFolderPath` is mandatory**: it represents the report folder where screenshots and widget rendering will
-be
-stored on test failure.
+be stored on test failure.
 
 > 📣 This package provides a custom Widget called `MaterialTestWidget`. This widget must encapsulate the widget to pump
 > to enable screenshots and widget rendering.
@@ -371,12 +421,12 @@ This reporter is in charge of:
 
 * printing the name of the running scenario with its file location,
 * printing each step with its status and time duration
-    * `√` if step succeeded
-    * `×` if step failed
-    * `-` if step skipped
+  * `√` if step succeeded
+  * `×` if step failed
+  * `-` if step skipped
 * printing the scenario execution result
-    * PASSED
-    * FAILED
+  * PASSED
+  * FAILED
 * handling text coloration
 
 _Example:_
@@ -407,6 +457,7 @@ The details for each test execution is also available:
 ![](md_assets/gitlab_ci_report_details.png)
 
 On failure, the `System output` contains:
+
 * a recap of steps with their status (passed, failed or skipped)
 * stacktrace of the exception
 * print of the widget rendering
@@ -420,13 +471,14 @@ On failure, a link to the screenshot is also provided.
 #### Add reporters in test configuration
 
 To benefit from supplied reporters, they need to be added on the `TestConfiguration`:
+
 ```dart
 TestConfiguration()
-..reporters = [
-WidgetStdoutReporter(),
-WidgetTestRunSummaryReporter(),
-XmlReporter(dirRoot: Directory.current.path)
-]
+  ..reporters = [
+    WidgetStdoutReporter(),
+    WidgetTestRunSummaryReporter(),
+    XmlReporter(dirRoot:Directory.current.path)
+  ]
 ```
 
 <!--
@@ -441,4 +493,4 @@ XmlReporter(dirRoot: Directory.current.path)
 
 🚧 _More details soon..._
 
---> 
+-->
