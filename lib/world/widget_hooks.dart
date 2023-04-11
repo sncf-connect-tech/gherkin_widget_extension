@@ -37,11 +37,15 @@ class WidgetHooks implements Hook {
 
   @override
   Future<void> onAfterStep(World world, String step, StepResult stepResult) async {
-    if ([StepExecutionResult.fail, StepExecutionResult.error].contains(stepResult.result)) {
-      var dumpFileName = _getDumpFilePath();
-      currentWorld.dumpFile = File("$dumpFileName.txt");
-      currentWorld.screenshot = File("$dumpFileName.png");
-      await takeScreenshot(withWidgetTreeRender: true);
+    try {
+      if ([StepExecutionResult.fail, StepExecutionResult.error].contains(stepResult.result)) {
+        var dumpFileName = _getDumpFilePath();
+        currentWorld.dumpFile = File("$dumpFileName.txt");
+        currentWorld.screenshot = File("$dumpFileName.png");
+        await takeScreenshot(withWidgetTreeRender: true);
+      }
+    } catch(e) {
+      throwsAssertionError;
     }
   }
 
@@ -60,8 +64,7 @@ class WidgetHooks implements Hook {
       await disposeWidget();
       currentWorld.dispose();
     } catch (e) {
-      log(e.toString());
-      rethrow;
+      throwsAssertionError;
     }
   }
 }
