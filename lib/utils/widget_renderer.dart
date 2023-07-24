@@ -1,12 +1,15 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../test_setup.dart';
+import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
-import 'package:flutter/rendering.dart';
 
-Future<void> takeScreenshot({withWidgetTreeRender = false}) async {
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:gherkin_widget_extension/gherkin_widget_extension.dart';
+
+import '../test_setup.dart';
+
+Future<void> takeScreenshot({withWidgetTreeRender = false, prefix = ''}) async {
   await currentWorld.tester.pumpAndSettle();
   RenderObject? renderObject = _getMainWidget()?.renderObject;
   if (renderObject != null) {
@@ -14,25 +17,39 @@ Future<void> takeScreenshot({withWidgetTreeRender = false}) async {
     ui.Image image = await boundary.toImage();
     ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     Uint8List pngBytes = byteData!.buffer.asUint8List();
-    await currentWorld.screenshot?.writeAsBytes(pngBytes);
-
+    final screenshotFile =
+        _getReportFolderPath(filenamePrefix: prefix, fileExtension: 'png');
+    await screenshotFile.writeAsBytes(pngBytes);
+    currentWorld.reportFilesPath.add(screenshotFile.path);
+    currentWorld.screenshot = screenshotFile;
     if (withWidgetTreeRender) {
-      await dumpWidgetRender();
+      await dumpWidgetRender(prefix: prefix);
     }
   } else {
     logger.e('Screenshot failed.');
   }
 }
 
-Future<void> dumpWidgetRender() async {
+Future<void> dumpWidgetRender({prefix = ''}) async {
   Element? widget = _getMainWidget();
   if (widget != null) {
     final widgetRendering = _printWidgetTree(_getMainWidget(), 0);
-    logger.i("Impression widget :\n $widgetRendering");
-    await currentWorld.dumpFile?.writeAsString(widgetRendering.toString());
+    logger.i("Widget tree render :\n $widgetRendering");
+    final dumpPath =
+        _getReportFolderPath(filenamePrefix: prefix, fileExtension: 'txt');
+    await dumpPath.writeAsString(widgetRendering.toString());
+    currentWorld.reportFilesPath.add(dumpPath.path);
+    currentWorld.dumpFileContent = widgetRendering;
   } else {
     logger.e('Widget render dump failed.');
   }
+}
+
+File _getReportFolderPath(
+    {required String filenamePrefix, required String fileExtension}) {
+  final scenarioName = currentWorld.getScenarioAsFileName();
+  return File(
+      '${currentWorld.reportFolderPath}/$filenamePrefix${filenamePrefix.isNotEmpty ? '_' : ''}$scenarioName.$fileExtension');
 }
 
 Element? _getMainWidget() {
@@ -56,9 +73,9 @@ String _printWidgetTree(Element? element, int level) {
     final children = element.debugDescribeChildren();
     if (children.isNotEmpty) {
       var childContent = "";
-      children.forEach((child) {
+      for (var child in children) {
         childContent += _printWidgetTree(child.value as Element?, level + 1);
-      });
+      }
       if (content.isNotEmpty) {
         return "$content\n$childContent";
       } else {
@@ -89,34 +106,24 @@ String? _printWidgetContent(Widget widget, int level) {
 final _widgetPrinter = {
   Text: (Widget widget) {
     final textContent = (widget as Text).data;
-    if (textContent != null && textContent.isNotEmpty) {
-      return "Text : $textContent";
-    } else {
-      return "";
-    }
+    return (textContent != null && textContent.isNotEmpty)
+        ? 'Text : $textContent'
+        : '';
   },
   TextField: (Widget widget) {
     final textContent = (widget as TextField).controller?.text;
-    if (textContent != null && textContent.isNotEmpty) {
-      return "TextField : $textContent";
-    } else {
-      return "";
-    }
+    return (textContent != null && textContent.isNotEmpty)
+        ? 'TextField : $textContent'
+        : '';
   },
   Semantics: (Widget widget) {
     final textContent = (widget as Semantics).properties.label;
-    if (textContent != null && textContent.isNotEmpty) {
-      return "Semantics : $textContent";
-    } else {
-      return "";
-    }
+    return (textContent != null && textContent.isNotEmpty)
+        ? 'Semantics : $textContent'
+        : '';
   },
   Checkbox: (Widget widget) {
     final isTicked = (widget as Checkbox).value ?? false;
-    if (isTicked) {
-      return "Checkbox cochée";
-    } else {
-      return "Checkbox décochée";
-    }
+    return isTicked ? 'Checkbox checked' : 'Checkbox unchecked';
   }
 };

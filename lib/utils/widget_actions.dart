@@ -16,13 +16,11 @@ extension CustomFinder on CommonFinders {
       of: find.bySemanticsLabel(semanticLabel, skipOffstage: skipOffstage),
       matching: find.byType(widgetType, skipOffstage: skipOffstage),
     );
-    expect(parentWidget, findsOneWidget, reason: "Aucun élément $semanticLabel de type $widgetType n'a été trouvé.");
-
     if (semanticMatcher != null) {
-      final semanticWidget = find.descendant(of: parentWidget, matching: bySemanticsLabel(semanticLabel));
+      final semanticWidget = find.descendant(
+          of: parentWidget, matching: bySemanticsLabel(semanticLabel));
       final widgetSemantics = currentWorld.tester.getSemantics(semanticWidget);
-      expect(widgetSemantics, semanticMatcher,
-          reason: "La sémantique de l'élément ${widgetSemantics.label} ne correspond pas à l'attendu");
+      expect(widgetSemantics, semanticMatcher);
     }
     return parentWidget;
   }

@@ -9,7 +9,7 @@ class CounterWidgetObject implements TestWidgets {
     var widgetToPump = const MaterialTestWidget(
       child: MyApp(),
     );
-    pumpWidget(widgetToPump);
+    await pumpWidget(widgetToPump);
   }
 
   Future<void> tapTheButton(String key, int count) async {
@@ -20,8 +20,6 @@ class CounterWidgetObject implements TestWidgets {
     }
   }
 
-  Future<void> checkDisplayedNumber(String count) async {
-    var button = find.widgetWithSemanticLabel(Text, count);
-    expect(button, findsOneWidget);
-  }
+  Future<void> checkDisplayedNumber(String count) async =>
+      expect(find.widgetWithSemanticLabel(Text, count), findsOneWidget);
 }

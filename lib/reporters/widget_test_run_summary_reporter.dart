@@ -55,11 +55,11 @@ class WidgetTestRunSummaryReporter extends WidgetStdoutReporter {
   String _collectScenarioSummary(Iterable<ScenarioFinishedMessage> scenarios) {
     final summaries = <String>[];
     if (scenarios.any((s) => s.passed)) {
-      summaries.add(PASS_COLOR("${scenarios.where((s) => s.passed).length} passed"));
+      summaries.add(passColor("${scenarios.where((s) => s.passed).length} passed"));
     }
 
     if (scenarios.any((s) => !s.passed)) {
-      summaries.add(FAIL_COLOR("${scenarios.where((s) => !s.passed).length} failed"));
+      summaries.add(failColor("${scenarios.where((s) => !s.passed).length} failed"));
     }
 
     return summaries.join(', ');
@@ -74,15 +74,15 @@ class WidgetTestRunSummaryReporter extends WidgetStdoutReporter {
         s.result.result == StepExecutionResult.fail ||
         s.result.result == StepExecutionResult.timeout);
     if (passed.isNotEmpty) {
-      summaries.add(PASS_COLOR("${passed.length} passed"));
+      summaries.add(passColor("${passed.length} passed"));
     }
 
     if (skipped.isNotEmpty) {
-      summaries.add(WARN_COLOR("${skipped.length} skipped"));
+      summaries.add(warnColor("${skipped.length} skipped"));
     }
 
     if (failed.isNotEmpty) {
-      summaries.add(FAIL_COLOR("${failed.length} failed"));
+      summaries.add(failColor("${failed.length} failed"));
     }
 
     return summaries.join(', ');

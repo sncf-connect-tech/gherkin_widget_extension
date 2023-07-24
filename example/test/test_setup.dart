@@ -10,7 +10,7 @@ import 'package:glob/glob.dart';
 
 import 'step_definitions/steps.dart';
 
-TestConfiguration TestWidgetsConfiguration({
+TestConfiguration testWidgetsConfiguration({
   String featurePath = '*.feature',
 }) {
   return TestConfiguration()
@@ -21,7 +21,7 @@ TestConfiguration TestWidgetsConfiguration({
     ..reporters = [
       WidgetStdoutReporter(),
       WidgetTestRunSummaryReporter(),
-      XmlReporter(dirRoot: Directory.current.path)
+      XmlReporter(dirRoot: Directory.current.path),
     ]
     ..stepDefinitions = [
       givenAFreshApp(),

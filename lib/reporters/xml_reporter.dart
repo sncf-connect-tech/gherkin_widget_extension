@@ -14,7 +14,8 @@ class XmlReporter extends Reporter {
   String outputFilename;
   String dirRoot;
 
-  XmlReporter({this.outputFilename = "junit-report.xml", required this.dirRoot});
+  XmlReporter(
+      {this.outputFilename = "junit-report.xml", required this.dirRoot});
 
   @override
   Future<void> onFeatureStarted(StartedMessage message) async {
@@ -38,16 +39,20 @@ class XmlReporter extends Reporter {
     if (!message.passed) {
       _testSuites[_testSuiteIndex].failures++;
     }
-    _testSuites[_testSuiteIndex].testCases[_testCaseIndex].isPassed = message.passed;
+    _testSuites[_testSuiteIndex].testCases[_testCaseIndex].isPassed =
+        message.passed;
     _testSuites[_testSuiteIndex].testCases[_testCaseIndex].time = DateTime.now()
-        .difference(_testSuites[_testSuiteIndex].testCases[_testCaseIndex].timestamp)
+        .difference(
+            _testSuites[_testSuiteIndex].testCases[_testCaseIndex].timestamp)
         .inMilliseconds
         .toString();
-    _testSuites[_testSuiteIndex].time =
-        DateTime.now().difference(_testSuites[_testSuiteIndex].timestamp).inMilliseconds.toString();
+    _testSuites[_testSuiteIndex].time = DateTime.now()
+        .difference(_testSuites[_testSuiteIndex].timestamp)
+        .inMilliseconds
+        .toString();
     //TODO améliorer le calcul du chemin pour la CI
     _testSuites[_testSuiteIndex].testCases[_testCaseIndex].dumpFileContent =
-        await currentWorld.dumpFile?.readAsString();
+        currentWorld.dumpFileContent;
     _testSuites[_testSuiteIndex].testCases[_testCaseIndex].screenshotPath =
         "$dirRoot/${p.relative(currentWorld.screenshot?.path.toString() ?? "")}";
     _testCaseIndex++;
@@ -58,7 +63,12 @@ class XmlReporter extends Reporter {
 
   @override
   Future<void> onStepFinished(StepFinishedMessage message) async {
-    _testSuites[_testSuiteIndex].testCases[_testCaseIndex].stepResults.add(message);
+    final attachments = message.attachments.map((e) => e.data).toList();
+    _testSuites[_testSuiteIndex].testCases[_testCaseIndex].stepResults.add(
+        TestStep(
+            name: message.name,
+            stepResult: message.result,
+            attachments: attachments));
   }
 
   @override
@@ -79,7 +89,7 @@ class XmlReporter extends Reporter {
     final builder = XmlBuilder();
     builder.processing('xml', 'version="1.0" encoding="UTF-8"');
     builder.element("testsuites", nest: () {
-      _testSuites.forEach((testSuite) {
+      for (var testSuite in _testSuites) {
         builder.element("testsuite", nest: () {
           builder.attribute("name", testSuite.name);
           builder.attribute("filename", testSuite.featureFile);
@@ -88,38 +98,44 @@ class XmlReporter extends Reporter {
           builder.attribute("errors", testSuite.errors);
           builder.attribute("time", testSuite.time);
           builder.attribute("suite", testSuite.name);
-          testSuite.testCases.forEach((testCase) {
+          for (var testCase in testSuite.testCases) {
             builder.element("testcase", nest: () {
               builder.attribute("name", testCase.name);
               builder.attribute("time", testCase.time);
-              var systemOut =
-                  testCase.stepResults.map((step) => step.name + ("." * 80) + step.result.result.name).join("\n");
+              var systemOut = testCase.stepResults
+                  .map((step) =>
+                      step.name + ("." * 80) + step.stepResult.result.name)
+                  .join("\n");
               builder.element("system-out", nest: () {
                 builder.text(systemOut);
                 if (!testCase.isPassed) {
                   builder.text("\n");
-                  builder.text("[[ATTACHMENT|${testCase.screenshotPath}]]");
+                  final screenshotPath = testCase.stepResults
+                      .firstWhere((element) =>
+                          element.stepResult.result ==
+                          StepExecutionResult.error)
+                      .attachments
+                      .firstWhere((element) => element.endsWith("png"));
+                  builder.text("[[ATTACHMENT|$screenshotPath]]");
                 }
               });
               if (!testCase.isPassed) {
                 var error = testCase.stepResults
-                    .firstWhere((element) => element.result.result != StepExecutionResult.pass)
-                    .result as ErroredStepResult;
+                    .firstWhere((element) =>
+                        element.stepResult.result != StepExecutionResult.pass)
+                    .stepResult as ErroredStepResult;
                 builder.element("failure", nest: () {
                   builder.attribute("message", error.exception);
                   builder.text("\n$systemOut\n\n"
                       "${error.exception}\n\n"
                       "${error.stackTrace}\n\n"
-                      "${"-" * 50}\n"
-                      "Impression widget :\n"
-                      "${"-" * 50}\n"
                       "${testCase.dumpFileContent ?? ""}");
                 });
               }
             });
-          });
+          }
         });
-      });
+      }
     });
     final document = builder.buildDocument();
     await File(outputFilename).writeAsString(document.toString());
@@ -149,11 +165,23 @@ class TestSuite {
 class TestCase {
   final String name;
   final DateTime timestamp = DateTime.now();
-  final List<StepFinishedMessage> stepResults = List.empty(growable: true);
+  final List<TestStep> stepResults = List.empty(growable: true);
   bool isPassed = false;
   String time = "0";
   String? dumpFileContent;
   String? screenshotPath;
 
   TestCase(this.name);
+}
+
+class TestStep {
+  final String name;
+  final StepResult stepResult;
+  final Iterable<String> attachments;
+
+  TestStep({
+    required this.name,
+    required this.stepResult,
+    required this.attachments,
+  });
 }
