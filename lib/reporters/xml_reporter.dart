@@ -1,12 +1,11 @@
 import 'dart:io';
 
 import 'package:gherkin/gherkin.dart';
+import 'package:gherkin_widget_extension/test_setup.dart';
+import 'package:path/path.dart' as p;
 import 'package:xml/xml.dart';
 
-import '../test_setup.dart';
-import 'package:path/path.dart' as p;
-
-class XmlReporter extends Reporter {
+class XmlReporter implements FullReporter {
   final List<TestSuite> _testSuites = List.empty(growable: true);
   int _testSuiteIndex = 0;
   int _testCaseIndex = 0;
@@ -18,58 +17,81 @@ class XmlReporter extends Reporter {
       {this.outputFilename = 'junit-report.xml', required this.dirRoot});
 
   @override
-  Future<void> onFeatureStarted(StartedMessage message) async {
-    _testSuites.add(TestSuite(message.name, message.context.filePath));
-    _testCaseIndex = 0;
-  }
+  ReportActionHandler<FeatureMessage> get feature => ReportActionHandler(
+        onStarted: ([message]) async {
+          if (message == null) {
+            logger.e('Cannot get feature information');
+          } else {
+            _testSuites.add(TestSuite(message.name, message.context.filePath));
+            _testCaseIndex = 0;
+          }
+        },
+        onFinished: ([message]) async {
+          _testSuiteIndex++;
+        },
+      );
 
   @override
-  Future<void> onFeatureFinished(FinishedMessage message) async {
-    _testSuiteIndex++;
-  }
+  ReportActionHandler<ScenarioMessage> get scenario => ReportActionHandler(
+        onStarted: ([message]) async {
+          if (message == null) {
+            logger.e('Cannot got scenario information');
+          } else {
+            _testSuites[_testSuiteIndex].testCases.add(TestCase(message.name));
+            _testSuites[_testSuiteIndex].tests++;
+          }
+        },
+        onFinished: ([message]) async {
+          if (message == null) {
+            logger.e('Cannot got scenario information');
+          } else {
+            if (!message.hasPassed) {
+              _testSuites[_testSuiteIndex].failures++;
+            }
+            _testSuites[_testSuiteIndex].testCases[_testCaseIndex].isPassed =
+                message.hasPassed;
+            _testSuites[_testSuiteIndex].testCases[_testCaseIndex].time =
+                DateTime.now()
+                    .difference(_testSuites[_testSuiteIndex]
+                        .testCases[_testCaseIndex]
+                        .timestamp)
+                    .inMilliseconds
+                    .toString();
+            _testSuites[_testSuiteIndex].time = DateTime.now()
+                .difference(_testSuites[_testSuiteIndex].timestamp)
+                .inMilliseconds
+                .toString();
+            //TODO améliorer le calcul du chemin pour la CI
+            _testSuites[_testSuiteIndex]
+                .testCases[_testCaseIndex]
+                .dumpFileContent = currentWorld.dumpFileContent;
+            _testSuites[_testSuiteIndex].testCases[_testCaseIndex].screenshotPath =
+                "$dirRoot/${p.relative(currentWorld.screenshot?.path.toString() ?? "")}";
+            _testCaseIndex++;
+          }
+        },
+      );
 
   @override
-  Future<void> onScenarioStarted(StartedMessage message) async {
-    _testSuites[_testSuiteIndex].testCases.add(TestCase(message.name));
-    _testSuites[_testSuiteIndex].tests++;
-  }
+  ReportActionHandler<StepMessage> get step => ReportActionHandler(
+        onFinished: ([message]) async {
+          if (message == null) {
+          } else {
+            final attachments =
+                message.attachments!.map((e) => e.data).toList();
+            _testSuites[_testSuiteIndex]
+                .testCases[_testCaseIndex]
+                .stepResults
+                .add(TestStep(
+                    name: message.name,
+                    stepResult: message.result!,
+                    attachments: attachments));
+          }
+        },
+      );
 
   @override
-  Future<void> onScenarioFinished(ScenarioFinishedMessage message) async {
-    if (!message.passed) {
-      _testSuites[_testSuiteIndex].failures++;
-    }
-    _testSuites[_testSuiteIndex].testCases[_testCaseIndex].isPassed =
-        message.passed;
-    _testSuites[_testSuiteIndex].testCases[_testCaseIndex].time = DateTime.now()
-        .difference(
-            _testSuites[_testSuiteIndex].testCases[_testCaseIndex].timestamp)
-        .inMilliseconds
-        .toString();
-    _testSuites[_testSuiteIndex].time = DateTime.now()
-        .difference(_testSuites[_testSuiteIndex].timestamp)
-        .inMilliseconds
-        .toString();
-    //TODO améliorer le calcul du chemin pour la CI
-    _testSuites[_testSuiteIndex].testCases[_testCaseIndex].dumpFileContent =
-        currentWorld.dumpFileContent;
-    _testSuites[_testSuiteIndex].testCases[_testCaseIndex].screenshotPath =
-        '$dirRoot/${p.relative(currentWorld.screenshot?.path.toString() ?? '')}';
-    _testCaseIndex++;
-  }
-
-  @override
-  Future<void> onStepStarted(StepStartedMessage message) async {}
-
-  @override
-  Future<void> onStepFinished(StepFinishedMessage message) async {
-    final attachments = message.attachments.map((e) => e.data).toList();
-    _testSuites[_testSuiteIndex].testCases[_testCaseIndex].stepResults.add(
-        TestStep(
-            name: message.name,
-            stepResult: message.result,
-            attachments: attachments));
-  }
+  ReportActionHandler<TestMessage> get test => ReportActionHandler();
 
   @override
   Future<void> onException(Object exception, StackTrace stackTrace) async {
@@ -122,7 +144,7 @@ class XmlReporter extends Reporter {
               if (!testCase.isPassed) {
                 var error = testCase.stepResults
                     .firstWhere((element) =>
-                        element.stepResult.result != StepExecutionResult.pass)
+                        element.stepResult.result != StepExecutionResult.passed)
                     .stepResult as ErroredStepResult;
                 builder.element('failure', nest: () {
                   builder.attribute('message', error.exception);

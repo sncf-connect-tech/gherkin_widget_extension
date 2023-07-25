@@ -3,7 +3,7 @@ import 'package:logger/logger.dart';
 
 import 'monochrome_printer.dart';
 
-class WidgetStdoutReporter extends Reporter {
+class WidgetStdoutReporter implements FullReporter {
   /// https://talyian.github.io/ansicolors/
   final AnsiColor neutralColor = AnsiColor.none();
   final AnsiColor debugColor = AnsiColor.fg(7); // gray
@@ -15,92 +15,99 @@ class WidgetStdoutReporter extends Reporter {
   final logger = Logger(printer: MonochromePrinter());
 
   @override
-  Future<void> onScenarioStarted(StartedMessage message) async {
-    logger.i(coolColor('\n${'-' * 100}\n'));
-    logger.i(coolColor(
-        '${DateTime.now()} - Running scenario: ${message.name + _getContext(message.context)}'));
-  }
+  Future<void> dispose() async {}
 
   @override
-  Future<void> onScenarioFinished(ScenarioFinishedMessage message) async {
-    var scenarioColor = message.passed ? passColor : failColor;
-    var scenarioStatus = message.passed ? 'PASSED' : 'FAILED';
-    logger.i('${scenarioColor(scenarioStatus)}: Scenario ${message.name}');
-  }
+  ReportActionHandler<FeatureMessage> get feature => ReportActionHandler();
 
   @override
-  Future<void> onStepFinished(StepFinishedMessage message) async {
-    var stepColor = message.result.result == StepExecutionResult.pass
-        ? passColor
-        : failColor;
-    String printMessage;
-    if (message.result is ErroredStepResult) {
-      var errorMessage = (message.result as ErroredStepResult);
-      printMessage =
-          failColor('${errorMessage.exception}\n${errorMessage.stackTrace}');
-    } else {
-      printMessage = [
-        stepColor('  '),
-        stepColor(_getStatePrefixIcon(message.result.result)),
-        stepColor(message.name),
-        neutralColor(_getExecutionDuration(message.result)),
-        stepColor(_getReasonMessage(message.result)),
-        stepColor(_getErrorMessage(message.result))
-      ].join((' ')).trimRight();
-    }
-    logger.i(printMessage);
+  Future<void> message(String message, MessageLevel level) async {}
 
-    // TODO adapter à cette classe
-    // if (message.attachments.isNotEmpty) {
-    //   message.attachments.forEach(
-    //     (attachment) {
-    //       var attachment2 = attachment;
-    //       printMessageLine(
-    //         [
-    //           '    ',
-    //           'Attachment',
-    //           '(${attachment2.mimeType})${attachment.mimeType == 'text/plain' ? ': ${attachment.data}' : ''}'
-    //         ].join((' ')).trimRight(),
-    //         StdoutReporter.RESET_COLOR,
-    //       );
-    //     },
-    //   );
-    // }
-  }
+  @override
+  Future<void> onException(Object exception, StackTrace stackTrace) async {}
 
-  String _getReasonMessage(StepResult stepResult) {
-    if (stepResult.resultReason != null &&
-        stepResult.resultReason!.isNotEmpty) {
-      return '\n      ${stepResult.resultReason}';
-    } else {
-      return '';
-    }
-  }
+  @override
+  ReportActionHandler<ScenarioMessage> get scenario => ReportActionHandler(
+        onStarted: ([message]) async {
+          logger.i(coolColor("\n${"-" * 100}\n"));
+          if (message == null) {
+            logger.i(failColor('Cannot get scenario information'));
+          } else {
+            logger.i(coolColor(
+                '${DateTime.now()} - Running scenario: ${message.name + _getContext(message.context)}'));
+          }
+        },
+        onFinished: ([message]) async {
+          if (message == null) {
+            logger.i(failColor('Cannot get scenario information'));
+          } else {
+            var scenarioColor = message.hasPassed ? passColor : failColor;
+            var scenarioStatus = message.hasPassed ? "PASSED" : "FAILED";
+            logger.i(
+                "${scenarioColor(scenarioStatus)}: Scenario ${message.name}");
+          }
+        },
+      );
 
-  String _getErrorMessage(StepResult stepResult) {
-    if (stepResult is ErroredStepResult) {
-      return '\n${stepResult.exception}\n${stepResult.stackTrace}';
-    } else {
-      return '';
-    }
-  }
+  @override
+  ReportActionHandler<StepMessage> get step => ReportActionHandler(
+        onFinished: ([message]) async {
+          if (message == null) {
+            logger.i(failColor('Cannot get scenario information'));
+          } else {
+            if (message.result == null) {
+              logger.i(failColor('Cannot get result scenario information'));
+            } else {
+              var stepColor =
+                  message.result!.result == StepExecutionResult.passed
+                      ? passColor
+                      : failColor;
+              String printMessage;
+              if (message.result is ErroredStepResult) {
+                var errorMessage = (message.result as ErroredStepResult);
+                printMessage = failColor(
+                    '${errorMessage.exception}\n${errorMessage.stackTrace}');
+              } else {
+                printMessage = [
+                  stepColor('  '),
+                  stepColor(_getStatePrefixIcon(message.result!.result)),
+                  stepColor(message.name),
+                  neutralColor(_getExecutionDuration(message.result!)),
+                  stepColor(_getReasonMessage(message.result!)),
+                  stepColor(_getErrorMessage(message.result!))
+                ].join((' ')).trimRight();
+              }
+              logger.i(printMessage);
+            }
+          }
+        },
+      );
 
-  String _getContext(RunnableDebugInformation context) {
-    return neutralColor(
-        '\t# ${_getFeatureFilePath(context)}:${context.lineNumber}');
-  }
+  @override
+  ReportActionHandler<TestMessage> get test => ReportActionHandler();
 
-  String _getFeatureFilePath(RunnableDebugInformation context) {
-    return context.filePath.replaceAll(RegExp(r'\.\\'), '');
-  }
+  String _getReasonMessage(StepResult stepResult) =>
+      (stepResult.resultReason != null && stepResult.resultReason!.isNotEmpty)
+          ? '\n      ${stepResult.resultReason}'
+          : '';
 
-  String _getExecutionDuration(StepResult stepResult) {
-    return ' (${stepResult.elapsedMilliseconds}ms)';
-  }
+  String _getErrorMessage(StepResult stepResult) =>
+      stepResult is ErroredStepResult
+          ? '\n${stepResult.exception}\n${stepResult.stackTrace}'
+          : '';
+
+  String _getContext(RunnableDebugInformation? context) => neutralColor(
+      "\t# ${_getFeatureFilePath(context)}:${context?.lineNumber}");
+
+  String _getFeatureFilePath(RunnableDebugInformation? context) =>
+      context?.filePath.replaceAll(RegExp(r'\.\\'), '') ?? '';
+
+  String _getExecutionDuration(StepResult stepResult) =>
+      ' (${stepResult.elapsedMilliseconds}ms)';
 
   String _getStatePrefixIcon(StepExecutionResult result) {
     switch (result) {
-      case StepExecutionResult.pass:
+      case StepExecutionResult.passed:
         return '√';
       case StepExecutionResult.error:
       case StepExecutionResult.fail:

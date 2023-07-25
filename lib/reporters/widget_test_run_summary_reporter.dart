@@ -3,39 +3,44 @@ import 'package:gherkin_widget_extension/reporters/widget_stdout_reporter.dart';
 
 class WidgetTestRunSummaryReporter extends WidgetStdoutReporter {
   final _timer = Stopwatch();
-  final List<StepFinishedMessage> _ranSteps = <StepFinishedMessage>[];
-  final List<ScenarioFinishedMessage> _ranScenarios = <ScenarioFinishedMessage>[];
+
+  final List<StepMessage> _ranSteps = <StepMessage>[];
+  final List<ScenarioMessage> _ranScenarios = <ScenarioMessage>[];
 
   @override
-  Future<void> onScenarioStarted(StartedMessage message) async {
-    // on n'implémente rien pour pas appeler CustomStdoutReporter.onScenarioStarted() en double
-  }
+  ReportActionHandler<ScenarioMessage> get scenario => ReportActionHandler(
+        onStarted: ([message]) async {},
+        onFinished: ([message]) async {
+          if (message == null) {
+            logger.i(failColor('Cannot get scenario information'));
+          } else {
+            _ranScenarios.add(message);
+          }
+        },
+      );
 
   @override
-  Future<void> onScenarioFinished(ScenarioFinishedMessage message) async {
-    _ranScenarios.add(message);
-  }
+  ReportActionHandler<StepMessage> get step => ReportActionHandler(
+        onStarted: ([message]) async {},
+        onFinished: ([message]) async {
+          if (message == null) {
+            logger.i(failColor('Cannot get scenario information'));
+          } else {
+            _ranSteps.add(message);
+          }
+        },
+      );
 
   @override
-  Future<void> onStepFinished(StepFinishedMessage message) async {
-    _ranSteps.add(message);
-  }
-
-  @override
-  Future<void> message(String message, MessageLevel level) async {}
-
-  @override
-  Future<void> onTestRunStarted() async {
-    _timer.start();
-  }
-
-  @override
-  Future<void> onTestRunFinished() async {
-    _timer.stop();
-    logger.i(_getRanScenariosSummary());
-    logger.i(_getRanStepsSummary());
-    logger.i('${Duration(milliseconds: _timer.elapsedMilliseconds)}\n');
-  }
+  ReportActionHandler<TestMessage> get test => ReportActionHandler(
+        onStarted: ([message]) async => _timer.start(),
+        onFinished: ([message]) async {
+          _timer.stop();
+          logger.i(_getRanScenariosSummary());
+          logger.i(_getRanStepsSummary());
+          logger.i('${Duration(milliseconds: _timer.elapsedMilliseconds)}\n');
+        },
+      );
 
   @override
   Future<void> dispose() async {
@@ -52,27 +57,31 @@ class WidgetTestRunSummaryReporter extends WidgetStdoutReporter {
     return '${_ranSteps.length} step${_ranSteps.length > 1 ? 's' : ''} (${_collectStepSummary(_ranSteps)})';
   }
 
-  String _collectScenarioSummary(Iterable<ScenarioFinishedMessage> scenarios) {
+  String _collectScenarioSummary(Iterable<ScenarioMessage> scenarios) {
     final summaries = <String>[];
-    if (scenarios.any((s) => s.passed)) {
-      summaries.add(passColor('${scenarios.where((s) => s.passed).length} passed'));
+    if (scenarios.any((s) => s.hasPassed)) {
+      summaries.add(
+          passColor("${scenarios.where((s) => s.hasPassed).length} passed"));
     }
 
-    if (scenarios.any((s) => !s.passed)) {
-      summaries.add(failColor('${scenarios.where((s) => !s.passed).length} failed'));
+    if (scenarios.any((s) => !s.hasPassed)) {
+      summaries.add(
+          failColor("${scenarios.where((s) => !s.hasPassed).length} failed"));
     }
 
     return summaries.join(', ');
   }
 
-  String _collectStepSummary(Iterable<StepFinishedMessage> steps) {
+  String _collectStepSummary(Iterable<StepMessage> steps) {
     final summaries = <String>[];
-    final passed = steps.where((s) => s.result.result == StepExecutionResult.pass);
-    final skipped = steps.where((s) => s.result.result == StepExecutionResult.skipped);
+    final passed =
+        steps.where((s) => s.result?.result == StepExecutionResult.passed);
+    final skipped =
+        steps.where((s) => s.result?.result == StepExecutionResult.skipped);
     final failed = steps.where((s) =>
-        s.result.result == StepExecutionResult.error ||
-        s.result.result == StepExecutionResult.fail ||
-        s.result.result == StepExecutionResult.timeout);
+        s.result?.result == StepExecutionResult.error ||
+        s.result?.result == StepExecutionResult.fail ||
+        s.result?.result == StepExecutionResult.timeout);
     if (passed.isNotEmpty) {
       summaries.add(passColor('${passed.length} passed'));
     }
