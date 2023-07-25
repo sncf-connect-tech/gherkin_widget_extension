@@ -15,7 +15,7 @@ class XmlReporter extends Reporter {
   String dirRoot;
 
   XmlReporter(
-      {this.outputFilename = "junit-report.xml", required this.dirRoot});
+      {this.outputFilename = 'junit-report.xml', required this.dirRoot});
 
   @override
   Future<void> onFeatureStarted(StartedMessage message) async {
@@ -54,7 +54,7 @@ class XmlReporter extends Reporter {
     _testSuites[_testSuiteIndex].testCases[_testCaseIndex].dumpFileContent =
         currentWorld.dumpFileContent;
     _testSuites[_testSuiteIndex].testCases[_testCaseIndex].screenshotPath =
-        "$dirRoot/${p.relative(currentWorld.screenshot?.path.toString() ?? "")}";
+        '$dirRoot/${p.relative(currentWorld.screenshot?.path.toString() ?? '')}';
     _testCaseIndex++;
   }
 
@@ -88,35 +88,35 @@ class XmlReporter extends Reporter {
   Future<void> _generateXmlJunitReport() async {
     final builder = XmlBuilder();
     builder.processing('xml', 'version="1.0" encoding="UTF-8"');
-    builder.element("testsuites", nest: () {
+    builder.element('testsuites', nest: () {
       for (var testSuite in _testSuites) {
-        builder.element("testsuite", nest: () {
-          builder.attribute("name", testSuite.name);
-          builder.attribute("filename", testSuite.featureFile);
-          builder.attribute("tests", testSuite.tests);
-          builder.attribute("failures", testSuite.failures);
-          builder.attribute("errors", testSuite.errors);
-          builder.attribute("time", testSuite.time);
-          builder.attribute("suite", testSuite.name);
+        builder.element('testsuite', nest: () {
+          builder.attribute('name', testSuite.name);
+          builder.attribute('filename', testSuite.featureFile);
+          builder.attribute('tests', testSuite.tests);
+          builder.attribute('failures', testSuite.failures);
+          builder.attribute('errors', testSuite.errors);
+          builder.attribute('time', testSuite.time);
+          builder.attribute('suite', testSuite.name);
           for (var testCase in testSuite.testCases) {
-            builder.element("testcase", nest: () {
-              builder.attribute("name", testCase.name);
-              builder.attribute("time", testCase.time);
+            builder.element('testcase', nest: () {
+              builder.attribute('name', testCase.name);
+              builder.attribute('time', testCase.time);
               var systemOut = testCase.stepResults
                   .map((step) =>
-                      step.name + ("." * 80) + step.stepResult.result.name)
-                  .join("\n");
-              builder.element("system-out", nest: () {
+                      step.name + ('.' * 80) + step.stepResult.result.name)
+                  .join('\n');
+              builder.element('system-out', nest: () {
                 builder.text(systemOut);
                 if (!testCase.isPassed) {
-                  builder.text("\n");
+                  builder.text('\n');
                   final screenshotPath = testCase.stepResults
                       .firstWhere((element) =>
                           element.stepResult.result ==
                           StepExecutionResult.error)
                       .attachments
-                      .firstWhere((element) => element.endsWith("png"));
-                  builder.text("[[ATTACHMENT|$screenshotPath]]");
+                      .firstWhere((element) => element.endsWith('png'));
+                  builder.text('[[ATTACHMENT|$screenshotPath]]');
                 }
               });
               if (!testCase.isPassed) {
@@ -124,12 +124,12 @@ class XmlReporter extends Reporter {
                     .firstWhere((element) =>
                         element.stepResult.result != StepExecutionResult.pass)
                     .stepResult as ErroredStepResult;
-                builder.element("failure", nest: () {
-                  builder.attribute("message", error.exception);
-                  builder.text("\n$systemOut\n\n"
-                      "${error.exception}\n\n"
-                      "${error.stackTrace}\n\n"
-                      "${testCase.dumpFileContent ?? ""}");
+                builder.element('failure', nest: () {
+                  builder.attribute('message', error.exception);
+                  builder.text('\n$systemOut\n\n'
+                      '${error.exception}\n\n'
+                      '${error.stackTrace}\n\n'
+                      '${testCase.dumpFileContent ?? ''}');
                 });
               }
             });
@@ -157,7 +157,7 @@ class TestSuite {
   int tests = 0;
   int failures = 0;
   int errors = 0;
-  String time = "0";
+  String time = '0';
 
   TestSuite(this.name, this.featureFile);
 }
@@ -167,7 +167,7 @@ class TestCase {
   final DateTime timestamp = DateTime.now();
   final List<TestStep> stepResults = List.empty(growable: true);
   bool isPassed = false;
-  String time = "0";
+  String time = '0';
   String? dumpFileContent;
   String? screenshotPath;
 

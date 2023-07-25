@@ -34,7 +34,7 @@ Future<void> dumpWidgetRender({prefix = ''}) async {
   Element? widget = _getMainWidget();
   if (widget != null) {
     final widgetRendering = _printWidgetTree(_getMainWidget(), 0);
-    logger.i("Widget tree render :\n $widgetRendering");
+    logger.i('Widget tree render :\n $widgetRendering');
     final dumpPath =
         _getReportFolderPath(filenamePrefix: prefix, fileExtension: 'txt');
     await dumpPath.writeAsString(widgetRendering.toString());
@@ -66,18 +66,18 @@ int? firstLevel;
 
 String _printWidgetTree(Element? element, int level) {
   if (element != null) {
-    var content = _printWidgetContent(element.widget, level) ?? "";
+    var content = _printWidgetContent(element.widget, level) ?? '';
     if (content.isNotEmpty) {
       firstLevel ??= level;
     }
     final children = element.debugDescribeChildren();
     if (children.isNotEmpty) {
-      var childContent = "";
+      var childContent = '';
       for (var child in children) {
         childContent += _printWidgetTree(child.value as Element?, level + 1);
       }
       if (content.isNotEmpty) {
-        return "$content\n$childContent";
+        return '$content\n$childContent';
       } else {
         return childContent;
       }
@@ -85,7 +85,7 @@ String _printWidgetTree(Element? element, int level) {
       return content;
     }
   } else {
-    return "";
+    return '';
   }
 }
 
@@ -93,37 +93,41 @@ String? _printWidgetContent(Widget widget, int level) {
   if (_widgetPrinter.containsKey(widget.runtimeType)) {
     var widgetContent = _widgetPrinter[widget.runtimeType]!.call(widget);
     if (widgetContent.isNotEmpty) {
-      return ("${"-" * (level - (firstLevel ?? level))} $widgetContent");
+      return ('${'-' * (level - (firstLevel ?? level))} $widgetContent');
     } else {
       return null;
     }
   } else {
-    // print ("${"-" * level}\t --> ${widget}");
+    // print ('${'-' * level}\t --> ${widget}');
     return null;
   }
 }
 
 final _widgetPrinter = {
-  Text: (Widget widget) {
-    final textContent = (widget as Text).data;
-    return (textContent != null && textContent.isNotEmpty)
-        ? 'Text : $textContent'
-        : '';
-  },
-  TextField: (Widget widget) {
-    final textContent = (widget as TextField).controller?.text;
-    return (textContent != null && textContent.isNotEmpty)
-        ? 'TextField : $textContent'
-        : '';
-  },
-  Semantics: (Widget widget) {
-    final textContent = (widget as Semantics).properties.label;
-    return (textContent != null && textContent.isNotEmpty)
-        ? 'Semantics : $textContent'
-        : '';
-  },
-  Checkbox: (Widget widget) {
-    final isTicked = (widget as Checkbox).value ?? false;
-    return isTicked ? 'Checkbox checked' : 'Checkbox unchecked';
-  }
+  Text: (Widget widget) => _getWidgetDisplay(widget),
+  TextField: (Widget widget) => _getWidgetDisplay(widget),
+  Semantics: (Widget widget) => _getWidgetDisplay(widget),
+  Checkbox: (Widget widget) => _getWidgetDisplay(widget),
+  Switch: (Widget widget) => _getWidgetDisplay(widget),
 };
+
+String _getWidgetDisplay(Widget widget) {
+  switch (widget.runtimeType) {
+    case Text:
+      return (widget as Text).data != null ? 'Text: ${widget.data}' : '';
+    case TextField:
+      return (widget as TextField).controller?.text != null
+          ? 'TextField: ${widget.controller?.text}'
+          : '';
+    case Semantics:
+      return (widget as Semantics).properties.label != null
+          ? 'Semantics: ${widget.properties.label}'
+          : '';
+    case Checkbox:
+      return 'Checkbox ${((widget as Checkbox).value ?? false) ? 'checked' : 'unchecked'}';
+    case Switch:
+      return 'Switch ${(widget as Switch).value ? 'activated' : 'deactivated'}';
+    default:
+      return '';
+  }
+}

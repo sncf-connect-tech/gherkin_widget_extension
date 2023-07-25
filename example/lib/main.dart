@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        fontFamily: "Lato",
+        fontFamily: 'Lato',
         // This is the theme of your application.
         //
         // Try running your application with "flutter run". You'll see the
@@ -97,6 +97,9 @@ class _MyHomePageState extends State<MyHomePage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            TextField(controller: TextEditingController(text: 'My text field')),
+            Checkbox(value: true, onChanged: (value) {}),
+            Switch(value: true, onChanged: (value){}),
             const Text(
               'You have pushed the button this many times:',
             ),

@@ -16,7 +16,7 @@ class WidgetStdoutReporter extends Reporter {
 
   @override
   Future<void> onScenarioStarted(StartedMessage message) async {
-    logger.i(coolColor("\n${"-" * 100}\n"));
+    logger.i(coolColor('\n${'-' * 100}\n'));
     logger.i(coolColor(
         '${DateTime.now()} - Running scenario: ${message.name + _getContext(message.context)}'));
   }
@@ -24,8 +24,8 @@ class WidgetStdoutReporter extends Reporter {
   @override
   Future<void> onScenarioFinished(ScenarioFinishedMessage message) async {
     var scenarioColor = message.passed ? passColor : failColor;
-    var scenarioStatus = message.passed ? "PASSED" : "FAILED";
-    logger.i("${scenarioColor(scenarioStatus)}: Scenario ${message.name}");
+    var scenarioStatus = message.passed ? 'PASSED' : 'FAILED';
+    logger.i('${scenarioColor(scenarioStatus)}: Scenario ${message.name}');
   }
 
   @override
@@ -59,7 +59,7 @@ class WidgetStdoutReporter extends Reporter {
     //         [
     //           '    ',
     //           'Attachment',
-    //           "(${attachment2.mimeType})${attachment.mimeType == 'text/plain' ? ': ${attachment.data}' : ''}"
+    //           '(${attachment2.mimeType})${attachment.mimeType == 'text/plain' ? ': ${attachment.data}' : ''}'
     //         ].join((' ')).trimRight(),
     //         StdoutReporter.RESET_COLOR,
     //       );
@@ -87,11 +87,11 @@ class WidgetStdoutReporter extends Reporter {
 
   String _getContext(RunnableDebugInformation context) {
     return neutralColor(
-        "\t# ${_getFeatureFilePath(context)}:${context.lineNumber}");
+        '\t# ${_getFeatureFilePath(context)}:${context.lineNumber}');
   }
 
   String _getFeatureFilePath(RunnableDebugInformation context) {
-    return context.filePath.replaceAll(RegExp(r"\.\\"), "");
+    return context.filePath.replaceAll(RegExp(r'\.\\'), '');
   }
 
   String _getExecutionDuration(StepResult stepResult) {

@@ -20,7 +20,7 @@ class WidgetCucumberWorld extends World {
   }
 
   String getScenarioAsFileName() {
-    return scenarioName.replaceAll(" ", "_").replaceAll(":_", "").toLowerCase();
+    return scenarioName.replaceAll(' ', '_').replaceAll(':_', '').toLowerCase();
   }
 
   WidgetCucumberWorld(this.tester, this.semantics);
