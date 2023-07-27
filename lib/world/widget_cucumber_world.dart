@@ -7,9 +7,12 @@ class WidgetCucumberWorld extends World {
   final WidgetTester tester;
   final SemanticsHandle semantics;
   late String scenarioName;
+  List<String> reportFilesPath = List.empty(growable: true);
   late String json;
   late Bucket bucket;
-  File? dumpFile;
+  late String reportFolderPath;
+  late String currentStep;
+  String? dumpFileContent;
   File? screenshot;
 
   T readBucket<T>() {
@@ -17,7 +20,7 @@ class WidgetCucumberWorld extends World {
   }
 
   String getScenarioAsFileName() {
-    return scenarioName.replaceAll(" ", "_").replaceAll(":_", "").toLowerCase();
+    return scenarioName.replaceAll(' ', '_').replaceAll(':_', '').toLowerCase();
   }
 
   WidgetCucumberWorld(this.tester, this.semantics);

@@ -1,7 +1,6 @@
 import 'dart:convert';
 
-import 'package:logger/src/logger.dart';
-import 'package:logger/src/log_printer.dart';
+import 'package:logger/logger.dart';
 
 class MonochromePrinter extends LogPrinter {
   MonochromePrinter();
