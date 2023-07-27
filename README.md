@@ -80,7 +80,7 @@ This README is based on some [gherkin](https://pub.dev/packages/gherkin) README 
 In the `pubspec.yaml` of your project, add the `gherkin_widget_extension` library in `dev_dependencies` :
 
 ```yaml
-gherkin_widget_extension: ^0.0.2
+gherkin_widget_extension: ^1.0.0
 ```
 
 Then run `pub get` to download the dependency.
