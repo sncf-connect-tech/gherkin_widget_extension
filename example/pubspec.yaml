@@ -40,7 +40,6 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   glob: ^2.1.1
-  gherkin: ^2.0.8
   gherkin_widget_extension:
     path: ../
 

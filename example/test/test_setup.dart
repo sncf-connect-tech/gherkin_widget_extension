@@ -13,21 +13,20 @@ import 'step_definitions/steps.dart';
 TestConfiguration testWidgetsConfiguration({
   String featurePath = '*.feature',
 }) {
-  return TestConfiguration()
-    ..features = [Glob(featurePath)]
-    ..hooks = [WidgetHooks(dumpFolderPath: 'widget_tests_report_folder')]
-    ..order = ExecutionOrder.sequential
-    ..stopAfterTestFailed = false
-    ..reporters = [
-      WidgetStdoutReporter(),
-      WidgetTestRunSummaryReporter(),
-      XmlReporter(dirRoot: Directory.current.path),
-    ]
-    ..stepDefinitions = [
-      givenAFreshApp(),
-      whenButtonTapped(),
-      thenCounterIsUpdated()
-    ]
-    ..defaultTimeout =
-        const Duration(milliseconds: 60000 * 10);
+  return TestConfiguration(features: [
+    Glob(featurePath)
+  ],
+      hooks: [
+    WidgetHooks(dumpFolderPath: 'widget_tests_report_folder')
+  ], reporters: [
+    WidgetStdoutReporter(),
+    WidgetTestRunSummaryReporter(),
+    XmlReporter(dirRoot: Directory.current.path),
+  ],
+      stepDefinitions: [
+    givenAFreshApp(),
+    whenButtonTapped(),
+    thenCounterIsUpdated()
+  ],
+      defaultTimeout: const Duration(milliseconds: 60000 * 10));
 }
