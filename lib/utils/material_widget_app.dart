@@ -4,6 +4,7 @@ class MaterialTestWidget extends StatelessWidget {
   final Widget child;
   final TargetPlatform? platform;
   final ThemeMode? themeMode;
+  final Iterable<Locale> supportedLocales;
   final Iterable<LocalizationsDelegate<dynamic>>? localizationsDelegates;
   final ThemeData? lightTheme;
   final ThemeData? darkTheme;
@@ -13,6 +14,7 @@ class MaterialTestWidget extends StatelessWidget {
       required this.child,
       this.platform,
       this.themeMode = ThemeMode.dark,
+      this.supportedLocales = const <Locale>[Locale('en', 'US')],
       this.localizationsDelegates,
       this.lightTheme,
       this.darkTheme});
@@ -26,6 +28,7 @@ class MaterialTestWidget extends StatelessWidget {
         themeMode: themeMode,
         // l'encapsulation dans RepaintBoundary permet la génération des screenshots
         home: RepaintBoundary(child: child),
+        supportedLocales: supportedLocales,
         localizationsDelegates: localizationsDelegates,
       );
 }
