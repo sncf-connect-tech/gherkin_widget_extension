@@ -1,3 +1,8 @@
+## 1.1.0
+* Set min Dart sdk 2.19.0 & min Flutter sdk 3.0.0
+* Upgraded logger dependency to 2.0.1
+* Upgraded flutter_lints to 3.0.0
+
 ## 1.0.1
 
 ### What's Changed

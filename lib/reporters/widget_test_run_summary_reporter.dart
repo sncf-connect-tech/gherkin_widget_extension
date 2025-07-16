@@ -12,7 +12,7 @@ class WidgetTestRunSummaryReporter extends WidgetStdoutReporter {
         onStarted: ([message]) async {},
         onFinished: ([message]) async {
           if (message == null) {
-            logger.i(failColor('Cannot get scenario information'));
+            logger.i(WidgetStdoutReporter.failColor('Cannot get scenario information'));
           } else {
             _ranScenarios.add(message);
           }
@@ -24,7 +24,7 @@ class WidgetTestRunSummaryReporter extends WidgetStdoutReporter {
         onStarted: ([message]) async {},
         onFinished: ([message]) async {
           if (message == null) {
-            logger.i(failColor('Cannot get scenario information'));
+            logger.i(WidgetStdoutReporter.failColor('Cannot get scenario information'));
           } else {
             _ranSteps.add(message);
           }
@@ -61,12 +61,12 @@ class WidgetTestRunSummaryReporter extends WidgetStdoutReporter {
     final summaries = <String>[];
     if (scenarios.any((s) => s.hasPassed)) {
       summaries.add(
-          passColor("${scenarios.where((s) => s.hasPassed).length} passed"));
+          WidgetStdoutReporter.passColor("${scenarios.where((s) => s.hasPassed).length} passed"));
     }
 
     if (scenarios.any((s) => !s.hasPassed)) {
       summaries.add(
-          failColor("${scenarios.where((s) => !s.hasPassed).length} failed"));
+          WidgetStdoutReporter.failColor("${scenarios.where((s) => !s.hasPassed).length} failed"));
     }
 
     return summaries.join(', ');
@@ -83,15 +83,15 @@ class WidgetTestRunSummaryReporter extends WidgetStdoutReporter {
         s.result?.result == StepExecutionResult.fail ||
         s.result?.result == StepExecutionResult.timeout);
     if (passed.isNotEmpty) {
-      summaries.add(passColor('${passed.length} passed'));
+      summaries.add(WidgetStdoutReporter.passColor('${passed.length} passed'));
     }
 
     if (skipped.isNotEmpty) {
-      summaries.add(warnColor('${skipped.length} skipped'));
+      summaries.add(WidgetStdoutReporter.warnColor('${skipped.length} skipped'));
     }
 
     if (failed.isNotEmpty) {
-      summaries.add(failColor('${failed.length} failed'));
+      summaries.add(WidgetStdoutReporter.failColor('${failed.length} failed'));
     }
 
     return summaries.join(', ');
