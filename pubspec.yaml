@@ -1,6 +1,6 @@
 name: gherkin_widget_extension
 description: An extension of gherkin package for widgets
-version: 1.0.1
+version: 1.0.2
 homepage: https://github.com/sncf-connect-tech/gherkin_widget_extension
 
 environment:
@@ -14,7 +14,7 @@ dependencies:
     sdk: flutter
   glob: ^2.1.1
   gherkin: ^3.1.0
-  logger: ^1.1.0
+  logger: ^2.0.1
   xml: ^6.0.1
   path: ^1.8.1
 

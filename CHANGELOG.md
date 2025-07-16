@@ -1,3 +1,6 @@
+## 1.0.2
+* Upgraded logger dependency to 2.0.1
+
 ## 1.0.1
 
 ### What's Changed
