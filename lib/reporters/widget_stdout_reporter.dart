@@ -5,12 +5,12 @@ import 'monochrome_printer.dart';
 
 class WidgetStdoutReporter implements FullReporter {
   /// https://talyian.github.io/ansicolors/
-  static const AnsiColor neutralColor = AnsiColor.none();
-  static const AnsiColor debugColor = AnsiColor.fg(7); // gray
-  static const AnsiColor failColor = AnsiColor.fg(9);
-  static const AnsiColor warnColor = AnsiColor.fg(208);
-  static const AnsiColor passColor = AnsiColor.fg(10);
-  static const AnsiColor coolColor = AnsiColor.fg(45);
+  final AnsiColor neutralColor = AnsiColor.none();
+  final AnsiColor debugColor = AnsiColor.fg(7); // gray
+  final AnsiColor failColor = AnsiColor.fg(9);
+  final AnsiColor warnColor = AnsiColor.fg(208);
+  final AnsiColor passColor = AnsiColor.fg(10);
+  final AnsiColor coolColor = AnsiColor.fg(45);
 
   final logger = Logger(printer: MonochromePrinter());
 

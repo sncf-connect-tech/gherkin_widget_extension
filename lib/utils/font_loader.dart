@@ -5,7 +5,6 @@
 /// license that can be found in the LICENSE file or at
 /// https://opensource.org/licenses/BSD-3-Clause
 /// ***************************************************
-library;
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
